@@ -122,6 +122,6 @@ class APIClient:
             response = self.session.patch(url=url,
                                           auth=HTTPBasicAuth(Users.USERNAME, Users.PASSWORD, json=booking_data))
             response.raise_for_status()
-            with allure.step("Checking status code"):
-                assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
+        with allure.step("Checking status code"):
+            assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
         return response.json()
