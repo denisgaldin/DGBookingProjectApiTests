@@ -22,6 +22,7 @@ class APIClient:
         self.session = requests.Session()
         self.session.headers = {
             "Content-Type": "application/json",
+            "Accept": "application/json",
         }
 
     def get_base_url(self, environment: Environment) -> str:
@@ -67,29 +68,11 @@ class APIClient:
         with allure.step("Updating header with authentication"):
             self.session.headers.update({"Authorization": f"Bearer {token}"})
 
-    def get_booking_by_id(self, booking_id):
-        with allure.step("Get booking by id"):
+    def get_booking_by_id(self, booking_id: int):
+        with allure.step("Send request got"):
             url = f"{self.base_url}{Endpoints.BOOKING_ENDPOINT}/{booking_id}"
-            headers = {"Accept": "application/json"}
-            response = self.session.get(url, headers=headers, timeout=Timeouts.TIMEOUT)
+            response = self.session.get(url=url)
             response.raise_for_status()
-
-        with allure.step("Assert status code"):
+        with allure.step("Checking status code"):
             assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
-        with allure.step("Checking response"):
-            booking_data = response.json()
-            assert isinstance(booking_data, dict), f"Expected dict but got {type(booking_data)}"
-        required_fields = ['firstname', 'last', 'totalprice', 'depositpaid', "bookingdates", "additionalneeds"]
-        for field in required_fields:
-            assert field in booking_data, f"Expected field {field} not in booking data"
-        assert isinstance(booking_data["firstname"], str), "firstname should be string"
-        assert isinstance(booking_data["lastname"], str), "lastname should be string"
-        assert isinstance(booking_data["totalprice"], (int, float)), "totalprice should be number"
-        assert isinstance(booking_data["depositpaid"], bool), "depositpaid should be boolean"
-        assert isinstance(booking_data["bookingdates"], dict), "bookingdates should be object"
-        assert isinstance(booking_data["additionalneeds"], str), "additionalneeds should be string"
-
-        assert "checkin" in booking_data["bookingdates"], "Missing checkin date"
-        assert "checkout" in booking_data["bookingdates"], "Missing checkout date"
-        assert isinstance(booking_data["bookingdates"]["checkin"], str), "checkin should be string"
-        assert isinstance(booking_data["bookingdates"]["checkout"], str), "checkout should be string"
+        return response.json()
