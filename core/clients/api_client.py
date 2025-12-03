@@ -1,5 +1,3 @@
-from sqlite3.dbapi2 import paramstyle
-
 import requests
 import os
 from dotenv import load_dotenv
