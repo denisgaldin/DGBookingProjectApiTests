@@ -7,7 +7,7 @@ from conftest import api_client, generate_random_booking_data
 
 @allure.feature('Test creating Booking')
 @allure.story('Positive: Creating booking with custom data')
-def test_creating_booking_with_custom_data(api_client):
+def test_creating_booking_with_custom_data(api_client, generate_random_booking_data):
     with allure.step("Подготовка данных для  создания брони"):
         booking_data = generate_random_booking_data
 
