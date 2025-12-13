@@ -1,7 +1,8 @@
 import allure
 import pytest
 import requests
-
+from pydantic import ValidationError
+from core.models.booking import BookingResponse
 from conftest import api_client, generate_random_booking_data
 
 
@@ -17,6 +18,11 @@ def test_creating_booking_with_random_data(api_client, generate_random_booking_d
 
     with allure.step("Проверка статуса ответа"):
         assert response.status_code == 200, f"Ожидался статус 200, получен {response.status_code}"
+
+    try:
+        BookingResponse(**response_json)
+    except ValidationError as e:
+        raise ValidationError(f"Response validation failed: {e}")
 
     with allure.step("Проверка параметров брони в ответе"):
         assert 'bookingid' in response_json, "В ответе отсутствует bookingid"
@@ -52,6 +58,10 @@ def test_creating_booking_with_custom_data(api_client):
 
     response = api_client.create_booking(booking_data)
     response_json = response.json()
+    try:
+        BookingResponse(**response_json)
+    except ValidationError as e:
+        raise ValidationError(f"Response validation failed: {e}")
 
     assert response_json['booking']['firstname'] == booking_data['firstname'], "firstname не совпадает с ожидаемым"
     assert response_json['booking']['lastname'] == booking_data['lastname'], "lastname не совпадает с ожидаемым"
@@ -73,4 +83,5 @@ def test_creating_booking_with_empty_booking_data(api_client):
     with allure.step('Checking status code'):
         with pytest.raises(requests.exceptions.HTTPError) as exc_info:
             api_client.create_booking(booking_data)
+
             assert exc_info.value.response.status_code == 500, f"Expected status 500 but got {exc_info.value.response.status_code}"
