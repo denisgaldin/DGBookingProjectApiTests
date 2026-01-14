@@ -6,11 +6,9 @@ pipeline {
     }
 
     stages {
-
         stage('Setup Python Environment') {
             steps {
                 sh 'python3 -m venv venv'
-
                 sh '''
                     . venv/bin/activate
                     pip install --upgrade pip
@@ -41,10 +39,7 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts(
-                artifacts: '**/allure-results/**',
-                allowEmptyArchive: true
-            )
+            archiveArtifacts artifacts: '**/allure-results/**', allowEmptyArchive: true
         }
 
         failure {
