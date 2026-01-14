@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        ENVIRONMENT = 'DEV'
+        ENVIRONMENT = 'TEST'
     }
 
     stages {
